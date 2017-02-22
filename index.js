@@ -18,7 +18,7 @@ var lastfm = new LastFmNode({
     secret: config.lastfm.secret,
 });
 
-bot.onText(/\/kogo_slushat (.*)/, (msg, match) => {
+bot.onText(/\/reg_fm (.*)/, (msg, match) => {
     const chat_id = msg.chat.id;
     let fm_username = match[1];
     console.log(fm_username);
@@ -35,7 +35,7 @@ bot.onText(/\/kogo_slushat (.*)/, (msg, match) => {
     })
 });
 
-bot.onText(/\/che_slushaem/, (msg, match) => {
+bot.onText(/\/cs/, (msg, match) => {
     console.log(msg);
     db.all('SELECT * FROM users WHERE id = ' + msg.from.id, (err, rows) => {
         if (rows.length == 1) {
@@ -62,5 +62,4 @@ bot.onText(/\/che_slushaem/, (msg, match) => {
             bot.sendMessage(msg.chat.id, 'tebya net v bd delay /kogo_slushat last_fm_username');
         }
     });
-
 });
