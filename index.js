@@ -46,6 +46,8 @@ bot.onText(/\/cs/, (msg, match) => {
                     success: data => {
                         console.log(data);
                         bot.sendMessage(msg.chat.id, JSON.stringify(data));
+                        bot.sendMessage(msg.chat.id, JSON.stringify(data.recenttracks['@attr'].user));
+                        bot.sendMessage(msg.chat.id, `SELECT * FROM users WHERE fm_username = "${data.recenttracks['@attr'].user}"`);
                         db.each(`SELECT * FROM users WHERE fm_username = "${data.recenttracks['@attr'].user}"`, (err, row) => {
                             bot.sendMessage(msg.chat.id, `Poc ${row.name}
                          slushaet melodiyu ${data.recenttracks.track[0].name} ot ${data.recenttracks.track[0].artist['#text']}`);
