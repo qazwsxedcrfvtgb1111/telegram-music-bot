@@ -7,5 +7,8 @@ export const strings = {
     not_found_db: 'tebya net v bd delay /reg_fm fm_username',
     help:
 `/reg_fm {username} - register a lastfm username
-/cs - current song`
+/cs - current song`,
+    listening:
+`%s:
+%s - %s`
 };

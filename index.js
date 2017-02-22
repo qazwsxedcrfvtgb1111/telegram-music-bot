@@ -24,7 +24,7 @@ bot.onText(/\/reg_fm (.*)/, (msg, match) => {
     const chat_id = msg.chat.id;
     let fm_username = match[1];
     db.serialize(() => {
-        db.run('INSERT OR REPLACE INTO users VALUES (' + msg.from.id + ',"' + msg.from.first_name + ' ' + msg.from.last_name + '","' + fm_username + '" )');
+        db.run('INSERT OR REPLACE INTO users VALUES (' + msg.from.id + ',"' + msg.from.first_name + (msg.from.last_name ? (' ' + msg.from.last_name) : '') + '","' + fm_username + '" )');
         db.all('SELECT * FROM users', (err, rows) => {
             let users = '';
             for (let row of rows) {
@@ -44,7 +44,7 @@ bot.onText(/\/cs/, (msg, match) => {
                 handlers: {
                     success: data => {
                         db.each(`SELECT * FROM users WHERE fm_username = "${data.recenttracks['@attr'].user}" COLLATE NOCASE`, (err, row) => {
-                            bot.sendMessage(msg.chat.id, `${row.name}: ${data.recenttracks.track[0].artist['#text']} - ${data.recenttracks.track[0].name}`);
+                            bot.sendMessage(msg.chat.id, sprintf(strings.listening, row.name, data.recenttracks.track[0].artist['#text'], data.recenttracks.track[0].name));
                         })
                     },
                     error: err => {
