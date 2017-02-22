@@ -10,5 +10,5 @@ export const strings = {
 /cs - current song`,
     listening:
 `%s:
-%s - %s`
+<b>%s - %s</b>`
 };

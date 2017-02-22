@@ -44,7 +44,7 @@ bot.onText(/\/cs/, (msg, match) => {
                 handlers: {
                     success: data => {
                         db.each(`SELECT * FROM users WHERE fm_username = "${data.recenttracks['@attr'].user}" COLLATE NOCASE`, (err, row) => {
-                            bot.sendMessage(msg.chat.id, sprintf(strings.listening, row.name, data.recenttracks.track[0].artist['#text'], data.recenttracks.track[0].name));
+                            bot.sendMessage(msg.chat.id, sprintf(strings.listening, row.name, data.recenttracks.track[0].artist['#text'], data.recenttracks.track[0].name), {parse_mode: 'HTML'});
                         })
                     },
                     error: err => {
