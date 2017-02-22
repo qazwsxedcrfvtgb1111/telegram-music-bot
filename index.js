@@ -33,11 +33,10 @@ bot.onText(/\/kogo_slushat (.*)/, (msg, match) => {
             bot.sendMessage(chat_id, 'slushaem pocanov: ' + users);
         });
     })
-
-
 });
 
 bot.onText(/\/che_slushaem/, (msg, match) => {
+    console.log(msg);
     db.all('SELECT * FROM users WHERE id = ' + msg.from.id, (err, rows) => {
         if (rows.length == 1) {
             lastfm.request('user.getRecentTracks', {
