@@ -1,7 +1,9 @@
 import TelegramBot from 'node-telegram-bot-api';
 import {LastFmNode} from 'lastfm';
 import sqlite3 from 'sqlite3';
-import config from './config';
+import {config} from './config';
+import {strings} from './strings';
+import {sprintf} from 'sprintf';
 
 let sqlite = sqlite3.verbose();
 
@@ -21,22 +23,19 @@ var lastfm = new LastFmNode({
 bot.onText(/\/reg_fm (.*)/, (msg, match) => {
     const chat_id = msg.chat.id;
     let fm_username = match[1];
-    console.log(fm_username);
     db.serialize(() => {
-        db.run('INSERT OR REPLACE INTO users VALUES (' + msg.from.id + ',"' + msg.from.first_name + ' ' + msg.from.last_name + '","' + fm_username + '" )')
+        db.run('INSERT OR REPLACE INTO users VALUES (' + msg.from.id + ',"' + msg.from.first_name + ' ' + msg.from.last_name + '","' + fm_username + '" )');
         db.all('SELECT * FROM users', (err, rows) => {
-            console.log(rows);
             let users = '';
             for (let row of rows) {
                 users += row.name + ' ';
             }
-            bot.sendMessage(chat_id, 'slushaem pocanov: ' + users);
+            bot.sendMessage(chat_id, sprintf(strings.users, users));
         });
     })
 });
 
 bot.onText(/\/cs/, (msg, match) => {
-    console.log(msg);
     db.all('SELECT * FROM users WHERE id = ' + msg.from.id, (err, rows) => {
         if (rows.length == 1) {
             lastfm.request('user.getRecentTracks', {
@@ -44,24 +43,22 @@ bot.onText(/\/cs/, (msg, match) => {
                 user: rows[0].fm_username,
                 handlers: {
                     success: data => {
-                        console.log(data);
-                        bot.sendMessage(msg.chat.id, JSON.stringify(data));
-                        bot.sendMessage(msg.chat.id, JSON.stringify(data.recenttracks['@attr'].user));
-                        bot.sendMessage(msg.chat.id, `SELECT * FROM users WHERE fm_username = "${data.recenttracks['@attr'].user}"`);
-                        db.each(`SELECT * FROM users WHERE fm_username = "${data.recenttracks['@attr'].user}"`, (err, row) => {
-                            bot.sendMessage(msg.chat.id, `Poc ${row.name}
-                         slushaet melodiyu ${data.recenttracks.track[0].name} ot ${data.recenttracks.track[0].artist['#text']}`);
+                        db.each(`SELECT * FROM users WHERE fm_username = "${data.recenttracks['@attr'].user}" COLLATE NOCASE`, (err, row) => {
+                            bot.sendMessage(msg.chat.id, `${row.name}: ${data.recenttracks.track[0].artist['#text']} - ${data.recenttracks.track[0].name}`);
                         })
                     },
                     error: err => {
                         console.log(err);
-                        bot.sendMessage(msg.chat.id, JSON.stringify(err));
-                        bot.sendMessage(msg.chat.id, 'last fm ne znaet kto ti poprobuy po drugomu /kogo_slushat fm_username');
+                        bot.sendMessage(msg.chat.id, strings.not_found_fm);
                     }
                 }
             })
         } else {
-            bot.sendMessage(msg.chat.id, 'tebya net v bd delay /kogo_slushat last_fm_username');
+            bot.sendMessage(msg.chat.id, strings.not_found_db);
         }
     });
+});
+
+bot.onText(/\/help/, (msg, match) => {
+    bot.sendMessage(msg.chat.id, strings.help);
 });
