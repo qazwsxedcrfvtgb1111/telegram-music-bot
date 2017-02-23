@@ -4,10 +4,11 @@ import sqlite3 from 'sqlite3';
 import {config} from './config';
 import {strings} from './strings';
 import {sprintf} from 'sprintf';
-
+import {YouTube} from './YouTube';
 let sqlite = sqlite3.verbose();
 
 const bot = new TelegramBot(config.telegram_token, {polling: true});
+let youtube = new YouTube();
 
 var db = new sqlite.Database(config.db);
 
@@ -44,7 +45,15 @@ bot.onText(/\/cs/, (msg, match) => {
                 handlers: {
                     success: data => {
                         db.each(`SELECT * FROM users WHERE fm_username = "${data.recenttracks['@attr'].user}" COLLATE NOCASE`, (err, row) => {
-                            bot.sendMessage(msg.chat.id, sprintf(strings.listening, row.name, data.recenttracks.track[0].artist['#text'], data.recenttracks.track[0].name), {parse_mode: 'HTML'});
+                            youtube.find(data.recenttracks.track[0].artist['#text'] + ' ' + data.recenttracks.track[0].name, result => {
+                                let str = '';
+                                if (result) {
+                                    str = sprintf(strings.listening_link, row.name, youtube.getVideoUrl(result[1]), data.recenttracks.track[0].artist['#text'], data.recenttracks.track[0].name)
+                                } else {
+                                    str = sprintf(strings.listening, row.name, data.recenttracks.track[0].artist['#text'], data.recenttracks.track[0].name);
+                                }
+                                bot.sendMessage(msg.chat.id, str, {parse_mode: 'HTML'});
+                            });
                         })
                     },
                     error: err => {
