@@ -10,7 +10,7 @@ export class YouTube {
     }
 
     find(str, callback) {
-        request(this.baseUrl + sprintf(this.search, str), function (error, response, body) {
+        request(this.baseUrl + encodeURI(sprintf(this.search, str)), function (error, response, body) {
             callback(body.match(/href="\/watch\?v=(.+?)"/));
         })
     }
