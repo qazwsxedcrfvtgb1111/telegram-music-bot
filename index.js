@@ -21,7 +21,7 @@ var lastfm = new LastFmNode({
     secret: config.lastfm.secret,
 });
 
-bot.onText(/\/reg_fm (.*)/, (msg, match) => {
+bot.onText(/\/reg_fm[@\w_]* (.*)/, (msg, match) => {
     const chat_id = msg.chat.id;
     let fm_username = match[1];
     db.serialize(() => {
